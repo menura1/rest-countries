@@ -1,6 +1,16 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'Country.g.dart';
+part 'country.g.dart';
+
+Country deserializeCountry(Map<String, dynamic> json) => Country.fromJson(json);
+
+List<Country> deserializeCountryList(List<Map<String, dynamic>> json) =>
+    json.map((e) => Country.fromJson(e)).toList();
+
+Map<String, dynamic> serializeCountry(Country object) => object.toJson();
+
+List<Map<String, dynamic>> serializeCountryList(List<Country> objects) =>
+    objects.map((e) => e.toJson()).toList();
 
 @JsonSerializable()
 class Country {
@@ -88,3 +98,5 @@ class Translation {
 
   Map<String, dynamic> toJson() => _$TranslationToJson(this);
 }
+
+

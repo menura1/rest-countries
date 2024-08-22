@@ -1,9 +1,10 @@
-import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rest_countries/data/api/RestClient.dart';
+import 'package:rest_countries/data/api/rest_client.dart';
 import 'package:rest_countries/data/enums/filters.dart';
-import 'package:rest_countries/data/models/Country.dart';
+import 'package:rest_countries/data/models/country.dart';
 
 part 'all_countries_screen_event.dart';
 
@@ -14,14 +15,30 @@ class AllCountriesScreenBloc
   AllCountriesScreenBloc() : super(AllCountriesScreenInitial()) {
     on<AllCountriesScreenEvent>((event, emit) async {
       if (event is AllCountriesScreenFetchData) {
+        final connections = await Connectivity().checkConnectivity();
+        if(connections.contains(ConnectivityResult.none)){
+          emit(AllCountriesScreenError("No network connection found!"),);
+          return;
+        }
+        /// emit loading state
         emit(AllCountriesScreenLoading());
-        RestClient client = RestClient(Dio());
-        final res = await client.getAllCountries();
-        emit(AllCountriesScreenSuccess(
-          res,
-          FilterName.population,
-          FilterOrder.asc,
-        ));
+
+        try {
+          /// get data from api
+          RestClient client = RestClient(Dio());
+          final res = await client.getAllCountries();
+
+          emit(
+            AllCountriesScreenSuccess(
+              res,
+              FilterName.population,
+              FilterOrder.asc,
+            ),
+          );
+        } catch (e) {
+          debugPrint(e.toString());
+          emit(AllCountriesScreenError("Failed to fetch data!"));
+        }
       } else if (event is AllCountriesScreenFilterUpdate) {
         if (state is AllCountriesScreenSuccess) {
           /// handling sort by population
@@ -59,7 +76,7 @@ class AllCountriesScreenBloc
                 (state as AllCountriesScreenSuccess).countries,
                 event.filterBy,
                 event.filterOrder));
-          }else if (event.filterBy == FilterName.capital) {
+          } else if (event.filterBy == FilterName.capital) {
             if (event.filterOrder == FilterOrder.asc) {
               (state as AllCountriesScreenSuccess).countries.sort((a, b) {
                 return (a.capital?[0] ?? '').compareTo(b.capital?[0] ?? '');
@@ -69,10 +86,12 @@ class AllCountriesScreenBloc
                 return (a.capital?[0] ?? '').compareTo(b.capital?[0] ?? '');
               });
             }
-            emit(AllCountriesScreenSuccess(
-                (state as AllCountriesScreenSuccess).countries,
-                event.filterBy,
-                event.filterOrder));
+            emit(
+              AllCountriesScreenSuccess(
+                  (state as AllCountriesScreenSuccess).countries,
+                  event.filterBy,
+                  event.filterOrder),
+            );
           }
         }
       }

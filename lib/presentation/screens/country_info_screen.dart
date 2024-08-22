@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:rest_countries/data/models/Country.dart';
+import 'package:rest_countries/data/models/country.dart';
 import 'package:rest_countries/util/common_utils.dart';
 
 class CountryInfoScreen extends StatefulWidget {
@@ -30,6 +30,24 @@ class _CountryInfoScreenState extends State<CountryInfoScreen> {
                 imageUrl: widget.country.flags?.png ?? "",
                 width: size.width,
                 fit: BoxFit.fill,
+                errorWidget: (context, url, error) => SizedBox(
+                  height: size.height * .3,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      Text(
+                        "Failed to load image!",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
             Padding(
@@ -58,12 +76,12 @@ class _CountryInfoScreenState extends State<CountryInfoScreen> {
                         width: 5,
                       ),
                       Text(
-                        "Region :" ?? "",
+                        "Region :",
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const Spacer(),
                       Text(
-                        widget.country.region?? "",
+                        widget.country.region ?? "",
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
@@ -78,7 +96,7 @@ class _CountryInfoScreenState extends State<CountryInfoScreen> {
                         width: 5,
                       ),
                       Text(
-                        "Capital :" ?? "",
+                        "Capital :",
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const Spacer(),
@@ -98,12 +116,12 @@ class _CountryInfoScreenState extends State<CountryInfoScreen> {
                         width: 5,
                       ),
                       Text(
-                        "Population :" ?? "",
+                        "Population :",
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const Spacer(),
                       Text(
-                        widget.country.population.toString() ?? "",
+                        widget.country.population.toString(),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
@@ -123,7 +141,9 @@ class _CountryInfoScreenState extends State<CountryInfoScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Text(
                     formatLanguages(widget.country.languages ?? {}),
                     style: Theme.of(context).textTheme.bodyLarge,

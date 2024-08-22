@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'RestClient.dart';
+part of 'rest_client.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -44,9 +44,10 @@ class _RestClient implements RestClient {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!
-        .map((dynamic i) => Country.fromJson(i as Map<String, dynamic>))
-        .toList();
+    var value = await compute(
+      deserializeCountryList,
+      _result.data!.cast<Map<String, dynamic>>(),
+    );
     return value;
   }
 

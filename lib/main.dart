@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rest_countries/presentation/screens/AllCountriesScreen.dart';
+import 'package:rest_countries/presentation/screens/all_countries_screen.dart';
 import 'package:rest_countries/theme/theme.dart';
 
 void main() {
