@@ -13,33 +13,40 @@ part 'all_countries_screen_state.dart';
 class AllCountriesScreenBloc
     extends Bloc<AllCountriesScreenEvent, AllCountriesScreenState> {
   AllCountriesScreenBloc() : super(AllCountriesScreenInitial()) {
-    on<AllCountriesScreenEvent>((event, emit) async {
-      if (event is AllCountriesScreenFetchData) {
-        final connections = await Connectivity().checkConnectivity();
-        if(connections.contains(ConnectivityResult.none)){
-          emit(AllCountriesScreenError("No network connection found!"),);
-          return;
-        }
-        /// emit loading state
-        emit(AllCountriesScreenLoading());
+    /// handling data fetching
+    on<AllCountriesScreenFetchData>((event, emit) async {
+      final connections = await Connectivity().checkConnectivity();
+      if (connections.contains(ConnectivityResult.none)) {
+        emit(
+          AllCountriesScreenError("No network connection found!"),
+        );
+        return;
+      }
 
-        try {
-          /// get data from api
-          RestClient client = RestClient(Dio());
-          final res = await client.getAllCountries();
+      /// emit loading state
+      emit(AllCountriesScreenLoading());
 
-          emit(
-            AllCountriesScreenSuccess(
-              res,
-              FilterName.population,
-              FilterOrder.asc,
-            ),
-          );
-        } catch (e) {
-          debugPrint(e.toString());
-          emit(AllCountriesScreenError("Failed to fetch data!"));
-        }
-      } else if (event is AllCountriesScreenFilterUpdate) {
+      try {
+        /// get data from api
+        RestClient client = RestClient(Dio());
+        final res = await client.getAllCountries();
+
+        emit(
+          AllCountriesScreenSuccess(
+            res,
+            FilterName.population,
+            FilterOrder.asc,
+          ),
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+        emit(AllCountriesScreenError("Failed to fetch data!"));
+      }
+    });
+
+    /// handling filter events
+    on<AllCountriesScreenFilterUpdate>(
+      (event, emit) {
         if (state is AllCountriesScreenSuccess) {
           /// handling sort by population
           if (event.filterBy == FilterName.population) {
@@ -94,7 +101,7 @@ class AllCountriesScreenBloc
             );
           }
         }
-      }
-    });
+      },
+    );
   }
 }
